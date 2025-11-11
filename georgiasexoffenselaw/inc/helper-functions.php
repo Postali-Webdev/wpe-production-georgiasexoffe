@@ -1,0 +1,170 @@
+<?php
+/**
+ * Helper Functions
+ *
+ * @package      GeorgiaSexOffenseLaw
+ * @author       Bill Erickson
+ * @since        1.0.0
+ * @license      GPL-2.0+
+**/
+
+// Duplicate 'the_content' filters
+global $wp_embed;
+add_filter( 'ea_the_content', array( $wp_embed, 'run_shortcode' ), 8 );
+add_filter( 'ea_the_content', array( $wp_embed, 'autoembed'     ), 8 );
+add_filter( 'ea_the_content', 'wptexturize'        );
+add_filter( 'ea_the_content', 'convert_chars'      );
+add_filter( 'ea_the_content', 'wpautop'            );
+add_filter( 'ea_the_content', 'shortcode_unautop'  );
+add_filter( 'ea_the_content', 'do_shortcode'       );
+
+/**
+ * Get the first term attached to post
+ *
+ * @param string $taxonomy
+ * @param string/int $field, pass false to return object
+ * @param int $post_id
+ * @return string/object
+ */
+function ea_first_term( $taxonomy = 'category', $field = false, $post_id = false ) {
+
+	$post_id = $post_id ? $post_id : get_the_ID();
+	$term = false;
+
+	// Use WP SEO Primary Term
+	// from https://github.com/Yoast/wordpress-seo/issues/4038
+	if( class_exists( 'WPSEO_Primary_Term' ) ) {
+		$term = get_term( ( new WPSEO_Primary_Term( $taxonomy,  $post_id ) )->get_primary_term(), $taxonomy );
+	}
+
+	// Fallback on term with highest post count
+	if( ! $term || is_wp_error( $term ) ) {
+
+		$terms = get_the_terms( $post_id, $taxonomy );
+
+		if( empty( $terms ) || is_wp_error( $terms ) )
+			return false;
+
+		// If there's only one term, use that
+		if( 1 == count( $terms ) ) {
+			$term = array_shift( $terms );
+
+		// If there's more than one...
+		} else {
+
+			// Sort by term order if available
+			// @uses WP Term Order plugin
+			if( isset( $terms[0]->order ) ) {
+				$list = array();
+				foreach( $terms as $term )
+					$list[$term->order] = $term;
+				ksort( $list, SORT_NUMERIC );
+
+			// Or sort by post count
+			} else {
+				$list = array();
+				foreach( $terms as $term )
+					$list[$term->count] = $term;
+				ksort( $list, SORT_NUMERIC );
+				$list = array_reverse( $list );
+			}
+
+			$term = array_shift( $list );
+		}
+	}
+
+	// Output
+	if( $field && isset( $term->$field ) )
+		return $term->$field;
+
+	else
+		return $term;
+}
+
+/**
+ * Conditional CSS Classes
+ *
+ * @param string $base_classes, classes always applied
+ * @param string $optional_class, additional class applied if $conditional is true
+ * @param bool $conditional, whether to add $optional_class or not
+ * @return string $classes
+ */
+function ea_class( $base_classes, $optional_class, $conditional ) {
+	return $conditional ? $base_classes . ' ' . $optional_class : $base_classes;
+}
+
+/**
+ * Column Classes
+ *
+ * Adds "-first" classes when appropriate for clearing float
+ * @see /assets/scss/partials/layout.scss
+ *
+ * @param array $classes, bootstrap-style classes, ex: array( 'col-lg-4', 'col-md-6' )
+ * @param int $current, current post in loop
+ * @param bool $join, whether to join classes (return string) or not (return array)
+ * @return string/array $classes
+ */
+function ea_column_class( $classes = array(), $current = false, $join = true ) {
+
+	if( false === $current )
+		return $classes;
+
+	$columns = array( 2, 3, 4, 6 );
+	foreach( $columns as $column ) {
+		if( 0 == $current % $column ) {
+
+			$col = 12 / $column;
+			foreach( $classes as $class ) {
+				if( false != strstr( $class, (string) $col ) && false == strstr( $class, '12' ) ) {
+					$classes[] = str_replace( $col, 'first', $class );
+				}
+			}
+		}
+	}
+
+	if( $join ) {
+		return join( ' ', $classes );
+	} else {
+		return $classes;
+	}
+}
+
+
+/**
+ * Sanitize Key
+ * Converts spaces into dashes, then sanitizes
+ *
+ */
+function ea_sanitize_key( $string = '' ) {
+    //return sanitize_key( str_replace( ' ', '-', $string ) );
+    return sanitize_title( $string );
+}
+
+
+/**
+ * Social Links
+ *
+ */
+function ea_social_links() {
+
+    $social_output = array();
+    $socials = array( 'Facebook', 'Twitter', 'LinkedIn', 'SlideShare', 'YouTube', 'Vimeo', 'RSS' );
+    foreach( $socials as $social ) {
+        $key = ea_sanitize_key( $social );
+        $url = esc_url( ea_cf( 'ea_' . $key, false, array( 'type' => 'theme_option' ) ) );
+        if( $url )
+            // Note the special exception for Youtube icon using str_replace
+            $social_output[] = '<a href="' . $url . '" target="_blank" rel="noopener noreferrer"><i class="icon-' . str_replace( 'youtube', 'youtube-play-button', $key ) . '"></i><span class="label">' . $social . '</span></a>';
+    }
+
+    if( !empty( $social_output) )
+        echo '<p class="socials">' . join( ' ', $social_output ) . '</p>';
+}
+
+/**
+ * Line Maker
+ *
+ */
+function ea_line_maker( $content = '' ) {
+	return '<div class="line-maker-outer"><div class="line-maker-inner">' . $content . '</div></div>';
+}

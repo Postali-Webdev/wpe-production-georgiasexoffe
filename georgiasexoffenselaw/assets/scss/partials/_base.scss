@@ -1,0 +1,54 @@
+// Base Font
+$base-font-family: 'Georgia', sans-serif;
+$secondary-font-family: 'Unna', serif;
+$tertiary-font-family: 'Montserrat', sans-serif;
+$base-margin: 32px;
+
+// Colors
+$brody: #607d8b;
+$brody_darker_20: #4B626D; // 20% darker
+$brody_lighter_10: #7B96A3; // 10% lighter
+$brody_lighter_20: #99AEB8; // 20% lighter
+$black: #000;
+$grey: #9b9b9b;
+$white: #fff;
+
+$base-color: $black;
+$highlight: $brody;
+$border-color: $grey;
+
+// Brand Colors
+$bc_facebook: #3b5998;
+$bc_twitter: #1da1f2;
+$bc_googleplus: #dd4b39;
+$bc_pinterest: #bd081c;
+$bc_email: $grey;
+$bc_print: $grey;
+
+// Sidr
+$sidr_width: 357px;
+$sidr_close: 48px;
+$sidr_total: $sidr_width + $sidr_close;
+
+// Breakpoints
+$screen-xs: 0;
+$screen-sm: $sidr_total;
+$screen-md: 768px;
+$screen-lg: 1024px;
+$screen-xl: 1200px;
+$max-width: 988px + 15px + 15px;
+
+// Bootstrap
+$grid-gutter-width: 30px;
+$grid-breakpoints: (
+	xs: $screen-xs,
+	sm: $screen-sm, // tablet
+	md: $screen-md,
+	lg: $screen-lg,
+	xl: $screen-xl,
+);
+
+@import "../vendor/bootstrap"; // Note: Unused CSS parts have been disabled
+//@import "../vendor/_include-media";
+@import "../modules/helpers";
+@import "../modules/base-styles";

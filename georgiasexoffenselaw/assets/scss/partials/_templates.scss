@@ -1,0 +1,472 @@
+
+/* Post Blocks : =blocks - used on home page and cat archives for the grid with non-touching borders layout
+---------------------------------------------------------------------------------------------------- */
+
+.post-blocks {
+  //display: flex;
+  //flex-flow: row wrap;
+  @include clearfix();
+  border-top: 1px solid $border-color;
+  padding-top:15px;
+
+
+  .post-block { // same div as the column classes are on
+
+    padding: 1px; // this is just to prevent margin collapse
+
+    @include media-breakpoint-up(md){
+      width: 50%;
+      float: left;
+    }
+
+    .post-block-inner {
+      border-bottom: 1px solid $border-color;
+      margin: 15px 15px;
+      height: calc(100% - 30px);
+      @include media-breakpoint-down(md){
+        margin-top: 25px;  // add more padding to top of cells
+      }
+    } // post-block-inner
+
+    // nth-of-type css below controls left/right borders on .post-block-inner to keep borders correct widths so that they match with .post-blocks top border
+    &:nth-of-type(odd){
+      @include media-breakpoint-up(md) {
+        .post-block-inner {
+          margin-left: 0px;
+        }
+      }
+    }
+
+    &:nth-of-type(even){
+      @include media-breakpoint-up(md) {
+        .post-block-inner {
+          margin-right: 0px;
+        }
+      }
+    }
+
+    .hentry.type-post {
+      margin: 0 -15px 35px;
+      padding: 0 45px;
+      height: calc(100% - 35px);
+      @include media-breakpoint-up(md){
+      }
+
+
+      .entry-title{
+        @include font-sizes( 24px, 30px, 30px);
+        font-weight: 700;
+        a{
+          color: #000;
+          text-decoration: none;
+          @include media-breakpoint-up(lg){
+            &:hover{
+              color: $brody_lighter_20;
+            }
+          }
+          &:active{
+            color: #000;
+          }
+        } // a
+      } // entry-title
+
+      .entry-content {
+          font-style: italic;
+      } // entry-content
+
+      p:last-of-type {
+        margin-bottom: 0px;
+      }
+
+    } // hentry.type-post
+
+
+    &:nth-of-type(odd){ // every odd-numbered post-block
+      clear: both;
+      .post-block-inner {
+        @include media-breakpoint-up(md) {
+        }
+      }
+    } // every odd-numbered post-block
+
+
+    &:nth-of-type(even){ // every even-numbered post-block
+      .post-block-inner {
+        .hentry.type-post {
+          @include media-breakpoint-up(md) {
+            border-left: 1px solid $border-color;
+          }
+        }
+      } // post-block-inner
+
+    } // every even-numbered post-block
+
+
+    &:nth-last-of-type(-n+2){ // last two post-blocks
+      .post-block-inner {
+        @include media-breakpoint-up(md) {
+          border-bottom: none;
+        }
+      } // post-block-inner
+
+    } // last two post-blocks
+
+    &:last-of-type{ // last post-block
+      .post-block-inner {
+        @include media-breakpoint-down(md) { // hide bottom border on small screens
+          border-bottom: none;
+        }
+      } // post-block-inner
+
+      .hentry.type-post {
+        @include media-breakpoint-down(md) { // no margin on small screens
+          margin-bottom: 0;
+        }
+      } // .hentry.type-post
+
+
+    } // last two post-blocks
+
+
+
+  } // .post-block
+} // post-blocks
+
+
+
+
+/* Print and PDF icons : =print =pdf
+* appear on single posts and single pages
+---------------------------------------------------------------------------------------------------- */
+
+.print-and-pdf {
+	text-align: center;
+	@include make-col(12);
+
+	a {
+		margin-right: 10px;
+
+		&:hover {
+			text-decoration: none;
+		}
+	}
+} // print-and-pdf
+
+
+
+
+
+
+/* Archives : =archives
+---------------------------------------------------------------------------------------------------- */
+
+.archive-intro {
+  @include make-col(12);
+}
+
+
+
+/* Category Archives : =categories =archives
+---------------------------------------------------------------------------------------------------- */
+body.archive.category {
+
+  .archive-intro{
+    margin-bottom: 15px;
+  }
+
+  .topic-selection { // =topic
+    position: relative;
+    max-width: 648px;
+    margin: 0 auto 32px;
+    @include media-breakpoint-up(md){
+      margin: 0 auto 48px;
+    }
+    a.topic-toggle {
+      font-family: $secondary-font-family;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #000;
+      text-transform: uppercase;
+      display: inline-block;
+      padding: 15px 8px 11px;
+      &:hover, &.active{
+        text-decoration: none;
+        background-color: $brody_lighter_20;
+        color: #fff;
+        i{
+          color: #fff;
+        }
+      }
+
+      i{
+        color: $brody;
+      }
+
+    } // topics-toggle
+
+    @include line-maker();
+    .line-maker-outer {  // line-maker adjustments
+      .line-maker-inner {
+        &:before {
+          right: 100%;
+          top: 48%;
+        }
+        &:after {
+          left: 100%;
+          top: 48%;
+        }
+
+      }
+      // .line-maker-inner
+    } // .line-maker-outer
+
+
+    ul.topics { // the dropdown
+      display: none;
+      z-index: 20;
+      position: absolute;
+
+      left: 0;
+      margin: 0 auto;
+      right: 0;
+
+      background: $brody;
+      background: rgba( 96, 125, 139, .95) ;
+      padding: 15px 0;
+      li {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+
+        &:hover{
+          background-color: $brody_lighter_20;
+        }
+
+        a {
+          color: #fff;
+          display: block;
+          font-family: $tertiary-font-family;
+          font-weight: 600;
+          padding: 10px 30px;
+          text-align: center;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-size: 16px;
+          &:hover{
+            text-decoration: none;
+          }
+        }
+
+      }
+    } // topics
+  } // topic-selection
+
+
+} // body.archive.category
+
+
+
+
+
+/* Single Pages : =pages =single
+---------------------------------------------------------------------------------------------------- */
+body.page {
+
+  .site-main {
+
+    & > .hentry { // target only main entry
+      .entry-content {
+        text-align: justify;
+        hyphens: auto;
+      }
+      // entry-content
+    }
+    // &>.hentry
+
+  }
+  // site-main
+
+} // body.page
+
+/* Single Posts : =posts =single
+---------------------------------------------------------------------------------------------------- */
+
+
+body.single-post {
+
+  .site-main {
+
+    &>.hentry{ // target only main entry
+      .entry-content {
+        text-align: justify;
+        hyphens: auto;
+      } // entry-content
+    } // &>.hentry
+
+  } // site-main
+
+  // SEE standalone section for print and pdf styling
+
+  .related-posts { // =related
+
+    @include make-col-ready;
+    @include make-col(12);
+    @include line-maker();
+    margin-top: 32px;
+    @include media-breakpoint-up(md){
+      margin-top: 48px;
+    }
+
+    .post-blocks{
+      border-top: none;
+    }
+
+    .line-maker-outer {  // line-maker adjustments
+      .line-maker-inner {
+        &:before {
+          top: 13%;
+          right: 110%;
+        }
+        &:after {
+          top: 13%;
+          left: 110%;
+        }
+      }
+      // .line-maker-inner
+    } // .line-maker-outer
+
+    h5.title{
+      font-size:20px;
+      line-height: 22px;
+      font-family: $secondary-font-family;
+      font-weight: 400;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+  } // related-posts
+
+
+} // body.single-post
+
+
+
+
+
+/* Home page : =home
+---------------------------------------------------------------------------------------------------- */
+body.home{
+
+  .home-top {
+    .wrap{
+      @include media-breakpoint-up(lg){
+        padding-bottom: 0px;
+      }
+
+    }
+
+    .home-slider {
+      padding-bottom: 32px;
+      .slide {
+        h6{ // category
+          text-align: center;
+        }
+        h2 {
+          text-align: center;
+          padding: 0 23px; // make room for arrows
+          margin-bottom: 0;
+            @include font-sizes( 40px,48px, 64px );
+          a {
+            color: #000;
+            &:hover{
+              color: $brody_lighter_20;
+              text-decoration: none;
+            }
+          }
+        }
+      } // slide
+    } // home-slider
+
+    .slick-dots { // dot navigation
+      margin: 30px 0 0;
+      text-align: center;
+    } // slick-dots
+
+    .slick-prev,
+    .slick-next { // arrow navigation, removed on 10-02-17
+      color: $brody;
+      top: 40%;
+      &:hover{
+        color: $brody_lighter_20;
+      }
+      i{
+        font-size:32px;
+      }
+
+    }
+
+    .slick-prev {
+      left: -10px;
+
+      @include media-breakpoint-up(md){
+        left: -80px;
+      }
+
+      @include media-breakpoint-up(lg){
+        left: -100px;
+      }
+    }
+
+    .slick-next {
+      right: -10px;
+
+      @include media-breakpoint-up(md){
+        right: -80px;
+      }
+
+      @include media-breakpoint-up(lg){
+        right: -100px;
+      }
+    }
+
+  } // home-top
+
+
+  .about { // =about
+    padding-top: 20px;
+    @include line-maker();
+    .line-maker-outer {  // line-maker adjustments
+      .line-maker-inner {
+        &:before {
+          right: 118%;
+          top: 13%;
+        }
+        &:after {
+          left: 118%;
+          top: 13%;
+        }
+      }
+      // .line-maker-inner
+    } // .line-maker-outer
+
+    h5.title{
+      font-size:20px;
+      line-height: 22px;
+      font-family: $secondary-font-family;
+      font-weight: 400;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+
+    .section-content {
+      text-align: center;
+      @include font-sizes( 18px, 18px, 24px)
+
+      p:last-of-type{
+        margin: 0;
+      }
+    }
+
+  } // home - about
+
+
+} // body.home

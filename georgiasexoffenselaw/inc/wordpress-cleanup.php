@@ -1,0 +1,147 @@
+<?php
+/**
+ * WordPress Cleanup
+ *
+ * @package      GeorgiaSexOffenseLaw
+ * @author       Bill Erickson
+ * @since        1.0.0
+ * @license      GPL-2.0+
+**/
+
+ /**
+  * Dont Update the Theme
+  *
+  * If there is a theme in the repo with the same name, this prevents WP from prompting an update.
+  *
+  * @since  1.0.0
+  * @author Bill Erickson
+  * @link   http://www.billerickson.net/excluding-theme-from-updates
+  * @param  array $r Existing request arguments
+  * @param  string $url Request URL
+  * @return array Amended request arguments
+  */
+ function ea_dont_update_theme( $r, $url ) {
+ 	if ( 0 !== strpos( $url, 'https://api.wordpress.org/themes/update-check/1.1/' ) )
+  		return $r; // Not a theme update request. Bail immediately.
+  	$themes = json_decode( $r['body']['themes'] );
+  	$child = get_option( 'stylesheet' );
+ 	unset( $themes->themes->$child );
+  	$r['body']['themes'] = json_encode( $themes );
+  	return $r;
+  }
+ add_filter( 'http_request_args', 'ea_dont_update_theme', 5, 2 );
+
+/**
+ * Dequeue jQuery Migrate
+ *
+ */
+function ea_dequeue_jquery_migrate( &$scripts ){
+	if( !is_admin() ) {
+		$scripts->remove( 'jquery');
+		$scripts->add( 'jquery', false, array( 'jquery-core' ), '1.10.2' );
+	}
+}
+add_filter( 'wp_default_scripts', 'ea_dequeue_jquery_migrate' );
+
+/**
+ * Header Meta Tags
+ *
+ */
+function ea_header_meta_tags() {
+	echo '<meta charset="' . get_bloginfo( 'charset' ) . '">';
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
+	echo '<link rel="profile" href="http://gmpg.org/xfn/11">';
+	echo '<link rel="pingback" href="' . get_bloginfo( 'pingback_url' ) . '">';
+}
+add_action( 'wp_head', 'ea_header_meta_tags' );
+
+/**
+ * Clean Nav Menu Classes
+ *
+ */
+function ea_clean_nav_menu_classes( $classes ) {
+
+	if( ! is_array( $classes ) )
+		return $classes;
+
+	$allowed_classes = array(
+		'menu-item',
+		'current-menu-item',
+		'current-menu-ancestor',
+		'menu-item-has-children',
+	);
+
+	return array_intersect( $classes, $allowed_classes );
+}
+add_filter( 'nav_menu_css_class', 'ea_clean_nav_menu_classes', 5 );
+
+/**
+ * Clean Post Classes
+ *
+ */
+function ea_clean_post_classes( $classes ) {
+
+	if( ! is_array( $classes ) )
+		return $classes;
+
+    $allowed_classes = array(
+  		'hentry',
+  		'type-' . get_post_type(),
+      'one-half',
+      'one-third',
+      'two-thirds',
+      'one-fourth',
+      'two-fourths',
+      'three-fourths',
+      'one-fifth',
+      'two-fifths',
+      'three-fifths',
+      'four-fifths',
+   	);
+
+	return array_intersect( $classes, $allowed_classes );
+}
+add_filter( 'post_class', 'ea_clean_post_classes', 5 );
+
+/**
+ * Remove ancient Custom Fields Metabox because it's slow and most often useless anymore
+ * ref: https://core.trac.wordpress.org/ticket/33885
+ */
+function ea_remove_custom_fields_metabox() {
+	foreach ( get_post_types( '', 'names' ) as $post_type ) {
+		remove_meta_box( 'postcustom' , $post_type , 'normal' );
+	}
+}
+add_action( 'admin_menu' , 'ea_remove_custom_fields_metabox' );
+
+/**
+ * Archive Title, remove prefix
+ *
+ */
+function ea_archive_title_remove_prefix( $title ) {
+	$title_pieces = explode( ': ', $title );
+	if( count( $title_pieces ) > 1 ) {
+		unset( $title_pieces[0] );
+		$title = join( ': ', $title_pieces );
+	}
+	return $title;
+}
+add_filter( 'get_the_archive_title', 'ea_archive_title_remove_prefix' );
+
+/**
+ * Excerpt Length
+ *
+ */
+function ea_excerpt_length() {
+	return 30;
+}
+add_filter( 'excerpt_length', 'ea_excerpt_length' );
+
+/**
+ * Excerpt More
+ *
+ */
+function ea_excerpt_more() {
+	return '&hellip;';
+}
+add_filter( 'excerpt_more', 'ea_excerpt_more' );
